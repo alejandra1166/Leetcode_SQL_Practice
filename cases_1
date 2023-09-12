@@ -229,4 +229,16 @@ group by teacher_id
 
 
 --Day 5-4
+-- find the daily active user count for a period of 30 days ending 2019-07-27 inclusively.
+--A user was active on someday if they made at least one activity on that day.
+--+------------+--------------+ 
+--| day        | active_users |
+--+------------+--------------+ 
+--| 2019-07-20 | 2            |
+--| 2019-07-21 | 2            |
+--+------------+--------------+ 
 
+SELECT activity_date, COUNT(DISTINCT user_id) as active_users
+FROM activity_sm
+where activity_date BETWEEN Dateadd(day,-30,'2019-07-27') AND  '2019-07-27'
+group by activity_date
