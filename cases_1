@@ -242,3 +242,43 @@ SELECT activity_date, COUNT(DISTINCT user_id) as active_users
 FROM activity_sm
 where activity_date BETWEEN Dateadd(day,-30,'2019-07-27') AND  '2019-07-27'
 group by activity_date
+
+
+--Day 5-5
+
+--Write a solution to select the product id, year, quantity, and price for the first year of every product sold.
+
+--+------------+------------+----------+-------+
+--| product_id | first_year | quantity | price |
+--+------------+------------+----------+-------+ 
+--| 100        | 2008       | 10       | 5000  |
+--| 200        | 2011       | 15       | 9000  |
+--+------------+------------+----------+-------+
+
+--joining 
+
+SELECT sales.product_id,  year, quantity, price
+FROM phone_sales as sales
+JOIN phone_product as product
+ON sales.product_id=product.product_id
+
+--raking products by year
+
+SELECT sale_id, product_id,  year, quantity, price, RANK() OVER (PARTITION BY product_id order by year) ranks
+FROM phone_sales
+
+--solving it
+
+SELECT sales.product_id,  year, quantity, price
+FROM (
+	SELECT sale_id
+				, product_id
+				,  year
+				, quantity
+				, price
+				, RANK() OVER (PARTITION BY product_id order by year) ranks
+	FROM phone_sales
+	) as sales
+JOIN phone_product as product
+ON sales.product_id=product.product_id
+where ranks = 1
