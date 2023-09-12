@@ -1,0 +1,232 @@
+
+--Day 3-4
+
+SELECT s.user_id, COUNT(IIF(c.action = 'confirmed', c.user_id, null))/CAST(COUNT(*) as decimal(3,2)) AS confirmation_rate			
+FROM confirmations as c
+FULL JOIN signups as s
+ON c.user_id = s.user_id
+group by  s.user_id
+
+
+--Day 3-5
+
+SELECT * 
+FROM CINEMA
+WHERE description <> 'boring' AND id % 2 <> 0
+order by rating DESC
+
+
+--Day 4-1
+
+
+SELECT p.product_id, CAST((SUM(units * price))as float)/SUM(units)
+FROM prices AS p
+inner JOIN unitssold as u
+ON p.product_id = u.product_id
+where purchase_date between start_date and end_date
+group by p.product_id
+
+
+--Day 4-2
+
+SELECT project_id, CAST(SUM(experience_years)AS decimal(3,2))/COUNT(*)as avg_years
+FROM employee_3 as e
+JOIN project as p
+on e.employee_id = p.employee_id
+group by project_id
+
+
+
+	SELECT project_id, CAST(AVG(experience_years +.0) AS DECIMAL(4,2))
+    FROM  employee_3 AS e
+    INNER JOIN project AS p
+      ON e.employee_id = p.employee_id
+ GROUP BY project_id
+
+ --Day 4-3
+
+SELECT contest_id, ((COUNT(DISTINCT user_id)/ (select count(user_id)+.0 from users)) * 100) as percentage
+from register
+group by contest_id
+ORDER BY percentage DESC
+ 
+ --Day 4-4
+
+	--quality
+
+SELECT query_name, CAST(AVG(rating/position+.0) AS DECIMAL(4,2)) as queries_quality
+FROM queries
+group by query_name
+
+--did it by myself
+
+--poor_ query_percentage
+
+
+SELECT query_name, (COUNT(rating)/((select count(rating)+.0  from queries)))*100
+FROM queries
+WHERE rating < 3
+GROUP BY query_name
+
+select count(rating)
+FROM queries
+WHERE rating < 3
+GROUP BY query_name
+
+---needed a way to add the where into the select...people helped me so
+
+
+--Final result : 
+
+select query_name, 
+		CAST(AVG(rating/position+.0) AS DECIMAL(4,2)) as quality, 
+		COUNT(CASE WHEN rating < 3 THEN 1 END) / (COUNT(*) * 1.0) as  poor_query_percentage
+from queries
+GROUP BY query_name
+order by query_name DESC
+
+
+--Day 4-5
+
+--first, group by
+
+select sum(amount)
+from transactions_bank
+group by DATEPART(month, trans_date), country
+
+--the number of transactions and their total amount,
+
+
+select COUNT(id) as trans_count, sum(amount) as trans_total_amount, 
+from transactions_bank
+group by DATEPART(month, trans_date), country
+
+
+--Count of approved transactions 
+select  country, COUNT(id) as trans_count, sum(amount) as trans_total_amount, COUNT(case when state = 'approved' THEN 1 END) as approved_count
+from transactions_bank
+group by DATEPART(month, trans_date), country
+
+
+--total SUM of approved transactions
+
+select  country
+		,COUNT(id) as trans_count
+		,SUM(amount) as trans_total_amount
+		,COUNT(case when state = 'approved' THEN 1 END) as approved_count
+		,SUM(case when state = 'approved' THEN amount ELSE 0 END) as approved_total_amount
+
+from transactions_bank
+group by DATEPART(month, trans_date), country
+
+--Final result 
+
+select  FORMAT(trans_date, 'MM-yyyy') as months
+		,country
+		,COUNT(id) as trans_count
+		,SUM(amount) as trans_total_amount
+		,COUNT(case when state = 'approved' THEN 1 END) as approved_count
+		,SUM(case when state = 'approved' THEN amount ELSE 0 END) as approved_total_amount
+
+from transactions_bank
+group by FORMAT(trans_date, 'MM-yyyy'), country
+
+--using only format, because it wil give u month 12 abd year 2019 and thats all u need to group by too
+
+
+--DAY 5-1
+
+--immediate = If the customer's preferred delivery date is the same as the order date  otherwise
+--scheduled = otherwise
+--The first order of a customer is the order with the earliest order date that the customer made
+
+-- find the percentage of IMMEDIATE orders in the FIRST  orders of all customers, rounded to 2 decimal places.
+
+--+----------------------+
+--| immediate_percentage |
+--+----------------------+
+--| 50.00                |
+--+----------------------+
+
+
+
+--SELECT * FROM delivery
+
+SELECT customer_id, order_date 
+FROM delivery
+
+--getting only te 1st orders
+
+
+SELECT *
+FROM (SELECT customer_id, order_date, customer_pref_delivery_date,RANK() OVER   
+    (PARTITION BY customer_id ORDER BY order_date) as ranks
+		from delivery) as delivery_rank
+where ranks = 1
+
+--doing the math and finding the percentage
+
+SELECT (SUM(CASE WHEN order_date = customer_pref_delivery_date THEN 1 ELSE 0 END)  * 100)/COUNT(customer_pref_delivery_date ) as immediate_percentage
+
+FROM (SELECT customer_id, order_date, customer_pref_delivery_date,RANK() OVER   
+    (PARTITION BY customer_id ORDER BY order_date) as ranks
+		from delivery) as delivery_rank
+where ranks = 1
+
+
+--Day 5-2
+--report the fraction of players that logged in again on the day after the day they first logged in, on other words:
+--count the number of players that logged in for at least two consecutive days starting from their first login date, 
+--then divide that number by the total number of players.
+
+--+-----------+
+--| fraction  |
+--+-----------+
+--| 0.33      |
+--+-----------+
+
+
+--counting repetitive days
+
+WITH cte1 AS (
+SELECT  event_date, DATEADD(d, - ROW_NUMBER() OVER  (ORDER BY event_date), event_date) as prev_date, player_id
+FROM activity_players
+)
+
+SELECT COUNT(prev_date)
+FROM cte1
+group by  prev_date
+
+--FINDING THE RESULT
+
+WITH cte1 AS (
+SELECT  event_date, DATEADD(d, - ROW_NUMBER() OVER  (ORDER BY event_date), event_date) as prev_date, player_id
+FROM activity_players
+)
+
+SELECT CAST((CASE WHEN COUNT(prev_date) = 2.0 THEN 1 ELSE 0 END ) AS DECIMAL(4,2))/ (SELECT COUNT(DISTINCT player_id) FROM activity_players)+.0
+FROM cte1
+group by  prev_date
+
+
+--Day 5-3
+
+--calculate the number of unique subjects each teacher teaches in the university.
+
+--+------------+-----+
+--| teacher_id | cnt |
+--+------------+-----+
+--| 1          | 2   |
+--| 2          | 4   |
+--+------------+-----+
+
+-- SELECT * FROM teacher
+
+
+SELECT teacher_id, COUNT(DISTINCT subject_id) as cnt
+FROM teacher
+group by teacher_id
+
+
+--Day 5-4
+
