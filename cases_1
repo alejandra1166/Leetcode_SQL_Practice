@@ -282,3 +282,85 @@ FROM (
 JOIN phone_product as product
 ON sales.product_id=product.product_id
 where ranks = 1
+
+
+
+--Day 6-1
+
+--find all the classes that have at least five students.
+--+---------+
+--| class   |
+--+---------+
+--| Math    |
+--+---------+
+
+--SELECT * FROM courses
+
+SELECT class
+FROM 
+	(SELECT COUNT(student) over (partition by class) as counted, class
+	FROM courses) as courses_counted
+where counted >= 5
+group by class
+
+--Day 6-2
+
+--Write a solution that will, for each user, return the number of followers.
+--      Return the result table ordered by user_id in ascending order.
+
+--+---------+----------------+
+--| user_id | followers_count|
+--+---------+----------------+
+--| 0       | 1              |
+--| 1       | 1              |
+--| 2       | 2              |
+--+---------+----------------+
+
+--SELECT * FROM followers
+
+SELECT user_id, count(follower_id)
+FROM followers
+group by user_id
+order by user_id
+
+
+--Day 6-3
+
+----A single number is a number that appeared only once in the MyNumbers table.
+--      Find the largest single number. 
+--	  If there is no single number, report null.
+
+--+-----+
+--| num |
+--+-----+
+--| 6   |
+--+-----+
+
+SELECT MAX(num) as num
+FROM (
+	select count(*) as counted, num
+	from mynumbers
+	group by num ) as grouped_num
+where counted = 1
+
+--Day 6-4
+
+--Write a solution to report the customer ids from the Customer table that bought all the products in the Product table.
++-------------+
+| customer_id |
++-------------+
+| 1           |
+| 3           |
++-------------+
+
+SELECT * FROM customer_two 
+SELECT * FROM product_two
+
+SELECT customer_id
+FROM (
+		SELECT product_key
+				,customer_id
+				,rank() over (partition by customer_Id order by product_key) as ranks
+		FROM customer_two 
+		) as table_ranked
+where ranks = 2
