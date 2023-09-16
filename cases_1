@@ -364,3 +364,104 @@ FROM (
 		FROM customer_two 
 		) as table_ranked
 where ranks = 2
+
+--Day 6-5
+
+--we will consider a manager an employee who has at least 1 other employee reporting to them.
+--report the ids and the names of all managers,
+--the number of employees who report directly to them,
+--and the average age of the reports rounded to the nearest integer.
+-- Return the result table ordered by employee_id.
+
++-------------+-------+---------------+-------------+
+| employee_id | name  | reports_count | average_age |
++-------------+-------+---------------+-------------+
+| 9           | Hercy | 2             | 39          |
++-------------+-------+---------------+-------------+
+
+--select * from employees_4
+
+select one.employee_id, one.name, COUNT(two.employee_id) as reports_to_manager, AVG(two.age) as av_age
+from employees_4 as one
+JOIN employees_4 as two
+ON one.employee_id = two.reports_to
+group by one.employee_id, one.name
+
+
+--Day 7-1
+
+--primary_flag is an ENUM (category) of type ('Y', 'N'). If the flag is 'Y', the department is the primary department for the employee. If the flag is 'N', the department is not the primary.
+--Note that when an employee belongs to only one department, their primary column is 'N'
+
+--Report all the employees with their primary department. 
+--For employees who belong to one department, report their only department.
+
+--+-------------+---------------+
+--| employee_id | department_id |
+--+-------------+---------------+
+--| 1           | 1             |
+--| 2           | 1             |
+--| 3           | 3             |
+--| 4           | 3             |
+--+-------------+---------------+
+
+--SELECT * FROM employees_5
+
+SELECT employee_id, department_id
+FROM (
+	SELECT employee_id
+		, COUNT(primary_flag) over (partition by employee_id) as numb_departments
+		, department_id
+		, primary_flag
+	FROM employees_5
+	) AS employees 
+WHERE numb_departments = 1 OR primary_flag = 'Y'
+
+
+--Day 7-2
+
+--Report for every three line segments whether they can form a triangle.
+--the sum of the lengths of any two sides of a triangle is always greater than the length of the third side
+
+--+----+----+----+----------+
+--| x  | y  | z  | triangle |
+--+----+----+----+----------+
+--| 13 | 15 | 30 | No       |
+--| 10 | 20 | 15 | Yes      |
+--+----+----+----+----------+
+
+SELECT x, y, z, CASE
+				WHEN X + Y >= z
+				THEN 'Yes'
+				ELSE 'No'
+				END as triangle
+FROM triangle
+
+
+--Day 7-3
+
+--Find all numbers that appear at least three times consecutively.
+
+--+-----------------+
+--| ConsecutiveNums |
+--+-----------------+
+--| 1               |
+--+-----------------+
+
+WITH cte1 as (
+SELECT id
+	, num
+	, LAG(num) over (order by id)as lag_num
+	, LEAD(num) over (order by id) as lead_num
+FROM logs
+)
+
+SELECT num as ConsecutiveNums
+from cte1
+where num = lag_num 
+		AND
+		num = lead_num
+
+
+
+
