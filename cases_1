@@ -118,6 +118,17 @@ FULL JOIN signups as s
 ON c.user_id = s.user_id
 group by  s.user_id
 
+--another answer-
+
+SELECT user_id, COALESCE(FORMAT(SUM(cases)/COUNT(cases), '.##'), '0+')as confirmation_rate
+FROM (
+		SELECT sg.user_id, action, (CASE
+				when con.action = 'confirmed' then 1+.0 else 0 end)as cases
+		FROM Confirmations as con
+		right Join Signups as sg
+		ON con.user_id = sg.user_id) AS cuentas
+group by user_id
+
 
 --Day 3-5
 
