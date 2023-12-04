@@ -140,14 +140,12 @@ order by rating DESC
 
 --Day 4-1
 
-
-SELECT p.product_id, CAST((SUM(units * price))as float)/SUM(units)
-FROM prices AS p
-inner JOIN unitssold as u
-ON p.product_id = u.product_id
-where purchase_date between start_date and end_date
-group by p.product_id
-
+SELECT s.product_id, ROUND(sum((price * units)+0.0)/sum(units),2)
+FROM prices as p
+Inner Join unitssold as s
+ON p.product_id = s.product_id
+Where purchase_date between start_date and end_date 
+Group by s.product_id
 
 --Day 4-2
 
