@@ -149,19 +149,20 @@ Group by s.product_id
 
 --Day 4-2
 
+
+SELECT p.project_id, ROUND(AVG(experience_years+0.0), 2)
+FROM project as p
+INNER JOIN employee_3 as em
+ON p.employee_id = em.employee_id
+group by p.project_id
+
+longer way to do it
+
 SELECT project_id, CAST(SUM(experience_years)AS decimal(3,2))/COUNT(*)as avg_years
 FROM employee_3 as e
 JOIN project as p
 on e.employee_id = p.employee_id
 group by project_id
-
-
-
-	SELECT project_id, CAST(AVG(experience_years +.0) AS DECIMAL(4,2))
-    FROM  employee_3 AS e
-    INNER JOIN project AS p
-      ON e.employee_id = p.employee_id
- GROUP BY project_id
 
  --Day 4-3
 
