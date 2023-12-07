@@ -205,7 +205,14 @@ select query_name,
 from queries
 GROUP BY query_name
 order by query_name DESC
+---------------------------------
+--another way to make that query: 
 
+SELECT query_name 
+	,ROUND(AVG((rating/position)+.0),2) as query_quality
+	,ROUND(((SUM(CASE WHEN rating < 3 then 1.0 else null end))/count(rating+0.0))*100,2) AS poor_query_percentage
+FROM queries
+group by query_name
 
 --Day 4-5
 
