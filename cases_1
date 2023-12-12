@@ -277,28 +277,11 @@ group by FORMAT(trans_date, 'MM-yyyy'), country
 --+----------------------+
 
 
-
---SELECT * FROM delivery
-
-SELECT customer_id, order_date 
-FROM delivery
-
---getting only te 1st orders
-
-
-SELECT *
-FROM (SELECT customer_id, order_date, customer_pref_delivery_date,RANK() OVER   
-    (PARTITION BY customer_id ORDER BY order_date) as ranks
-		from delivery) as delivery_rank
-where ranks = 1
-
---doing the math and finding the percentage
-
-SELECT (SUM(CASE WHEN order_date = customer_pref_delivery_date THEN 1 ELSE 0 END)  * 100)/COUNT(customer_pref_delivery_date ) as immediate_percentage
-
-FROM (SELECT customer_id, order_date, customer_pref_delivery_date,RANK() OVER   
-    (PARTITION BY customer_id ORDER BY order_date) as ranks
-		from delivery) as delivery_rank
+SELECT (SUM(CASE WHEN  order_date = customer_pref_delivery_date THEN 1.0 ELSE NULL end)/COUNT(customer_id)) *100 as '%_Immediate_orders'
+FROM (
+	SELECT *, RANK () over (partition by customer_id order by order_date) as ranks
+	FROM delivery
+	) AS ranked
 where ranks = 1
 
 
