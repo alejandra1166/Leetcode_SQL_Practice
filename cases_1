@@ -319,6 +319,15 @@ SELECT CAST((CASE WHEN COUNT(prev_date) = 2.0 THEN 1 ELSE 0 END ) AS DECIMAL(4,2
 FROM cte1
 group by  prev_date
 
+--An easier way to solve it:
+
+SELECT FORMAT((sum(CASE when DATEDIFF(DAY,date2, event_date) = 1 THEN 1.0 ELSE null END))
+		/COUNT(distinct(player_id)),'0.##') as Fraction_of_players
+FROM (
+		SELECT player_id, event_date, LAG(event_date) over (order by player_id) as date2
+		FROM activity_players
+		) AS dates_lag
+
 
 --Day 5-3
 
