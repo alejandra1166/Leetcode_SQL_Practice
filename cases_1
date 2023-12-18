@@ -364,6 +364,21 @@ where activity_date BETWEEN Dateadd(day,-30,'2019-07-27') AND  '2019-07-27'
 group by activity_date
 
 
+--Another way to do it:
+
+--Finding when the 30 days start:
+
+SELECT DATEDIFF(DAY,'2019-06-27','2019-07-27')
+FROM activity_sm
+
+--Getting the final results:
+
+SELECT activity_date, COUNT(DISTINCT user_id)
+FROM activity_sm
+WHERE activity_date BETWEEN '2019-06-27'and'2019-07-27'
+GROUP BY activity_date
+
+
 --Day 5-5
 
 --Write a solution to select the product id, year, quantity, and price for the first year of every product sold.
