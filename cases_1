@@ -418,6 +418,19 @@ JOIN phone_product as product
 ON sales.product_id=product.product_id
 where ranks = 1
 
+--Another way to solve it:
+
+
+SELECT product_id, year, quantity, price
+FROM (
+		SELECT p.product_id, year, quantity, price, RANK() over (partition by p.product_id order by year) as Ranks 
+		FROM Sales as s
+		right JOIN product as p
+		ON s.product_id = p.product_id
+		) AS ranking
+WHERE Ranks = 1 AND year IS NOT NULL
+
+
 
 
 --Day 6-1
