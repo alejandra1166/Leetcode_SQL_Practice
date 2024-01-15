@@ -522,27 +522,23 @@ FROM (
 		) as table_ranked
 where ranks = 2
 
+
 --Day 6-5
 
 --we will consider a manager an employee who has at least 1 other employee reporting to them.
 --report the ids and the names of all managers,
---the number of employees who report directly to them,
---and the average age of the reports rounded to the nearest integer.
+--the number of employees who report directly to them (subordinates),
+--and the average age of the subordinates rounded to the nearest integer.
 -- Return the result table ordered by employee_id.
 
-+-------------+-------+---------------+-------------+
-| employee_id | name  | reports_count | average_age |
-+-------------+-------+---------------+-------------+
-| 9           | Hercy | 2             | 39          |
-+-------------+-------+---------------+-------------+
+--SELECT * FROM employees_and_managers
 
---select * from employees_4
+SELECT a.employee_id as manager_id, a.name as manager_name, COUNT(b.employee_id) as subordinates, ROUND(AVG(b.age+0.1), 0) as Avg_age_subordinates
+FROM employees_and_managers as a
+INNER JOIN employees_and_managers as b
+ON a.employee_id = b.reports_to
+GROUP BY a.employee_id, a.name
 
-select one.employee_id, one.name, COUNT(two.employee_id) as reports_to_manager, AVG(two.age) as av_age
-from employees_4 as one
-JOIN employees_4 as two
-ON one.employee_id = two.reports_to
-group by one.employee_id, one.name
 
 
 --Day 7-1
