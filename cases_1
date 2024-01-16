@@ -570,6 +570,26 @@ FROM (
 	) AS employees 
 WHERE numb_departments = 1 OR primary_flag = 'Y'
 
+--Another way to solve it:
+
+
+SELECT employee_id, department_id
+FROM employees_5
+where primary_flag = 'Y'
+
+UNION
+
+SELECT a.employee_id, b.department_id
+from 
+	(select count(employee_id) as counting, employee_id
+	FROM employees_5
+	group by employee_id) as a
+INNER JOIN employees_5 as b
+on a.employee_id = b.employee_id
+where counting = 1
+
+
+
 
 --Day 7-2
 
