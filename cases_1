@@ -653,6 +653,22 @@ where num = lag_num
 
 --Select * from products_3
 
+
+
+SELECT product_id, MAX(new_price) as new_newprice
+FROM (
+	SELECT product_id, (CASE
+						WHEN change_date between '2019-08-14' and '2019-08-16' THEN new_price 
+						ELSE 10
+						END) as new_price
+	FROM products_3
+	) idea
+group by  product_id
+
+
+--Another way to solve it
+
+
 WITH cte1 AS(
 SELECT *, ROW_NUMBER() OVER (PARTITION BY product_id order by product_id DESC) AS row_num
 FROM (
