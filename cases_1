@@ -753,14 +753,16 @@ GROUP BY cat_table.category
 
 --Day 8-2
 
-SELECT b.employee_id
-FROM employees_6 as a
-JOIN employees_6 as b
-ON a.manager_id = b.employee_id
-WHERE a.salary < 30000
+
+SELECT * 
+FROM [dbo].[employees_6] as emp
+left JOIN employees_6 as managers
+ON emp.manager_id = managers.employee_id 
+
+where emp.salary < 30000 and managers.manager_id is null
 
 
---Mejor solucion 
+--Another solution
 
 SELECT *
 FROM employees_6
