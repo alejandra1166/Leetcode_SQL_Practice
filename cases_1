@@ -778,6 +778,17 @@ SELECT ID,
 FROM table_seats
 
 
+--Another similar way to solve it
+
+SELECT id, CASE 
+			WHEN leads IS NULL THEN student
+			WHEN Id % 2 <> 0 THEN leads
+			WHEN id % 2 = 0 THEN lags
+			 end
+FROM (
+SELECT id, student, LAG(student) over(order by id)lags, LEAD(student) over(order by id) leads
+FROM table_seats) seats
+
 
 --Day 8-4
 
