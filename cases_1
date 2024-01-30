@@ -942,6 +942,22 @@ SELECT TOP 1 id, num
 FROM cte1
 order by num DESC
 
+
+--Another way to solve it:
+
+
+WITH CTE1 AS (
+
+SELECT requester_id as id
+FROM [dbo].[request_acepted] 
+union all
+SELECT accepter_id as id
+FROM [dbo].[request_acepted] 
+)
+select top 1 id, COUNT(id) as friends
+from cte1
+group by id
+order by friends desc
 	
 --Day 9-2
 
