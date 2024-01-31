@@ -1048,22 +1048,30 @@ where lat_c = 1 and lon_c =1
 --SELECT * FROM employees_7
 --SELECT * FROM department
 
---ranking to get the top 3 of each
-
- SELECT rank() OVER(PARTITION BY departmentid ORDER BY salary DESC) as ranks, SALARY
-FROM employees_7
-
---solving
-
 SELECT department.name, employees.name, salary
-FROM ( SELECT Rank() OVER(PARTITION BY departmentid ORDER BY salary DESC) as ranks
+FROM ( SELECT dense_Rank() OVER(PARTITION BY departmentid ORDER BY salary DESC) as ranks
 		, SALARY
 		, name
 		, departmentid
 	FROM employees_7 ) as employees
 JOIN department
 ON employees.departmentid = department.id
-where ranks in (1, 2, 3, 4)
+Where ranks <= 3
+
+
+--Another way to solve it
+
+WITH cte1 AS (
+SELECT salary, dep.name as department, emp.name as Employee, dense_rank() over (partition by dep.name  order by salary desc) as ranks
+FROM employees_7 as emp
+join department as dep
+on emp.departmentId = dep.id
+
+) 
+
+Select Salary, department, Employee
+from cte1
+Where ranks <= 3
 
 --Day 9-4
 
