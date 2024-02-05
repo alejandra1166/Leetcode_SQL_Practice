@@ -1122,6 +1122,21 @@ DELETE Person FROM (SELECT id, EMAIL, RANK() OVER(partition by email order BY id
 WHERE Ranks >= 2
 
 
+--Another way to solve it
+
+
+
+with cte1 as (
+select * 
+from (
+	SELECT id, email, rank() over(partition by email order by id) as ranks
+	FROM person
+) a
+)
+
+DELETE FROM cte1
+where  ranks >= 2
+
 --10-2
 WITH cte1 AS(
 SELECT salary, Rank() over(order by salary) as Ranks
