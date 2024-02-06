@@ -1199,6 +1199,23 @@ on cte1.sell_date = activities.sell_date
 group by cte1.sell_date, num_sold
 
 
+--Another way to solve it
+
+with cte1 as (
+Select sell_date, Count(product) as number_sold, 
+					(SELECT ', ',product from activities as a2
+					where a1.sell_date =a2.sell_date
+					FOR XML PATH(''),TYPE).value('.','varchar(max)') as list
+from activities as a1
+group by sell_date
+)
+
+select sell_date, number_sold, STUFF(list, 1, 1, '') as list
+from cte1
+
+
+
+
 --Day 10-4
 
 -- get the names of products that have at least 100 units ordered in February 2020 
