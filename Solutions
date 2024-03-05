@@ -70,6 +70,21 @@ ON w.recorddate = cte.temp_comparadas
 WHERE  w.temperature > cte.temp_comparadas
 
 --Day 2-5
+SELECT AVG(ends - starts) as time_process
+FROM (
+		SELECT machine_id, 
+		process_id, 
+		activity_type, 
+		timestamp as ends, 
+		(LAG(timestamp) over (order by machine_id, process_id, activity_type desc )) as starts
+		FROM activity) lagging
+where activity_type = 'end'		
+group by machine_id
+
+
+
+--another way to solve it
+
 WITH cte1 
 AS(
 SELECT machine_id
