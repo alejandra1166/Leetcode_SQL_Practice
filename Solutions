@@ -83,7 +83,7 @@ group by machine_id
 
 
 
---another way to solve it
+--another solution
 
 WITH cte1 
 AS(
@@ -133,7 +133,7 @@ FULL JOIN signups as s
 ON c.user_id = s.user_id
 group by  s.user_id
 
---another answer-
+--another solution
 
 SELECT user_id, COALESCE(FORMAT(SUM(cases)/COUNT(cases), '.##'), '0+')as confirmation_rate
 FROM (
@@ -143,6 +143,17 @@ FROM (
 		right Join Signups as sg
 		ON con.user_id = sg.user_id) AS cuentas
 group by user_id
+
+--another solution
+
+
+SELECT sig.user_id, (COUNT(CASE WHEN conf.action = 'confirmed' THEN 1.0 else null end))/ (total_actions + 0.0)
+FROM  confirmations as conf
+right join signups as sig
+ON conf.user_id = sig.user_id
+full  JOIN (SELECT user_id, COUNT(action) as total_actions FROM  confirmations GROUP BY user_id) as total_actions
+on sig.user_id = total_actions.user_id
+group by sig.user_id, total_actions
 
 
 --Day 3-5
@@ -221,7 +232,7 @@ from queries
 GROUP BY query_name
 order by query_name DESC
 ---------------------------------
---another way to make that query: 
+--another solution: 
 
 SELECT query_name 
 	,ROUND(AVG((rating/position)+.0),2) as query_quality
@@ -379,7 +390,7 @@ where activity_date BETWEEN Dateadd(day,-30,'2019-07-27') AND  '2019-07-27'
 group by activity_date
 
 
---Another way to do it:
+--Another solution
 
 --Finding when the 30 days start:
 
@@ -433,7 +444,7 @@ JOIN phone_product as product
 ON sales.product_id=product.product_id
 where ranks = 1
 
---Another way to solve it:
+--Another solution
 
 
 SELECT product_id, year, quantity, price
@@ -525,7 +536,7 @@ FROM (
 where products_bought = 2
 
 
---Another way to solve it...
+--Another solution
 
 
 SELECT customer_id
@@ -585,7 +596,7 @@ FROM (
 	) AS employees 
 WHERE numb_departments = 1 OR primary_flag = 'Y'
 
---Another way to solve it:
+--Another solution
 
 
 SELECT employee_id, department_id
@@ -681,7 +692,7 @@ FROM (
 group by  product_id
 
 
---Another way to solve it
+--Another solution
 
 
 WITH cte1 AS(
@@ -793,7 +804,7 @@ SELECT ID,
 FROM table_seats
 
 
---Another similar way to solve it
+--Another solutions
 
 SELECT id, CASE 
 			WHEN leads IS NULL THEN student
@@ -958,7 +969,7 @@ FROM cte1
 order by num DESC
 
 
---Another way to solve it:
+--Another solution
 
 
 WITH CTE1 AS (
@@ -1020,7 +1031,7 @@ WHERE lat_count = 1
 	tiv_count > 1
 
 
---Another way to do it
+--Another solution
 
 WITH cte1 as (
 SELECT pid, a.tiv_2015, a.tiv_2016, lat, lon, counting
@@ -1074,7 +1085,7 @@ ON employees.departmentid = department.id
 Where ranks <= 3
 
 
---Another way to solve it
+--Another solution
 
 WITH cte1 AS (
 SELECT salary, dep.name as department, emp.name as Employee, dense_rank() over (partition by dep.name  order by salary desc) as ranks
@@ -1137,7 +1148,7 @@ DELETE Person FROM (SELECT id, EMAIL, RANK() OVER(partition by email order BY id
 WHERE Ranks >= 2
 
 
---Another way to solve it
+--Another solution
 
 
 
@@ -1214,7 +1225,7 @@ on cte1.sell_date = activities.sell_date
 group by cte1.sell_date, num_sold
 
 
---Another way to solve it
+--Another solution
 
 with cte1 as (
 Select sell_date, Count(product) as number_sold, 
@@ -1255,7 +1266,7 @@ INNER JOIN products_4 as products
 on totales.product_id = products.product_id
 where total >= 100
 
---Another way to solve it
+--Another solution
 
 
 
