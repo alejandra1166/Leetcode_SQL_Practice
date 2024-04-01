@@ -192,7 +192,7 @@ group by project_id
 
  --Day 4-3
 
-SELECT contest_id, ((COUNT(DISTINCT user_id)/ (select count(user_id)+.0 from users)) * 100) as percentage
+SELECT contest_id, ((COUNT(user_id)/ (select count(user_id)+.0 from users)) * 100) as percentage
 from register
 group by contest_id
 ORDER BY percentage DESC
