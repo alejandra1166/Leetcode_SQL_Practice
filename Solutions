@@ -758,7 +758,7 @@ union all
 
 
 
-								SELECT cat_table.category, COALESCE(COUNT(q.category), 0) accounts_count 
+SELECT cat_table.category, COALESCE(COUNT(q.category), 0) accounts_count 
 FROM (
     SELECT 
         CASE WHEN income < 20000 THEN 'Low Salary' 
@@ -775,6 +775,26 @@ RIGHT JOIN
 ON q.category = cat_table.category
 GROUP BY cat_table.category
 
+--Another way
+
+
+WITH CTE1 AS (
+SELECT 'Low Salary' as Category
+UNION
+select 'Average Salary' as Category
+union 
+select 'High Salary' as Category
+) 
+
+SELECT categories.Category, Count(accounts_filtered.category) as accounts_count
+FROM (SELECT 
+        CASE WHEN income < 20000 THEN 'Low Salary' 
+            WHEN income between  20000 AND 50000 THEN 'Average Salary'
+            WHEN income > 50000 THEN 'High Salary' END category
+    FROM Accounts) as accounts_filtered
+FULL JOIN CTE1 as categories
+ON accounts_filtered.category = categories.Category
+group by categories.Category
 
 
 --Day 8-2
