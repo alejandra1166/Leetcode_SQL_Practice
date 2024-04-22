@@ -816,12 +816,21 @@ where manager_id  NOT in (SELECT employee_id FROM employees_6)
 
 --Day 8-3
 
+SELECT id, ISNULL((
+		IIF((id % 2 <> 0), LEAD(student) over (order by id), LAG(student) over (order by id))
+			), student)as a
+FROM table_seats
+
+--Another solution
+
 SELECT ID, 
 		ISNULL(CASE WHEN id % 2 = 0 
 		THEN LAG(student) OVER (ORDER BY ID) 
 		ELSE LEAD(student) OVER (ORDER BY ID) 
 		END, student) AS student
 FROM table_seats
+
+
 
 
 --Another solutions
