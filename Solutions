@@ -861,71 +861,25 @@ FROM table_seats) seats
 --SELECT * FROM users_movies
 --SELECT * FROM movie_rating
 
---first try 
-WITH CTE1 AS (
-	SELECT TOP 1 max(num_ratings) as ratings, user_id
-	FROM (
-		SELECT user_id, COUNT(user_id) as num_ratings
-		FROM movie_rating
-		group by user_id ) as counts
-	group by user_id
-	order by user_Id
+WITH cte1 AS (
+SELECT top 1 users.name
+	, COUNT(rating.user_id) as counts
+	, movies.title
+	, AVG(CASE 
+		WHEN created_at between '2020-02-01' and '2020-02-29'
+		THEN rating 
+		ELSE null 
+		END) as average_rating
+FROM movie_rating as rating
+inner JOIN users_movies as users
+on rating.user_id = users.user_id
+inner join movies
+ON rating.movie_id = movies.movie_id
+group by users.name, movies.title
 )
 
-SELECT users.name
-FROM CTE1
-JOIN users_movies as users
-ON CTE1.user_id = users.user_id
-
---second
-
-SELECT TOP 1  count(rating.user_id)num_rates, name
-FROM users_movies as movies
-	JOIN movie_rating as rating
-	ON movies.user_id = rating.user_id
-group by name
-order by num_rates desc, name
-
-SELECT TOP 1 AVG(rating) avg_rating, title
-FROM movies
-	JOIN movie_rating as rating
-	ON movies.movie_id = rating.movie_id
-WHERE created_at between '2020-01-01' and '2020-12-31'
-group by title
-order by  avg_rating desc, title 
-
---uniendo las dos
-
-SELECT TOP 1  count(rating.user_id)num_rates, users.name, AVG(rating) avg_rating, title
-FROM users_movies as users
-	JOIN movie_rating as rating
-	ON users.user_id = rating.user_id
-	JOIN movies
-	ON movies.movie_id = rating.movie_id
-WHERE created_at between '2020-01-01' and '2020-12-31'
-group by name, title
-order by num_rates desc, name, avg_rating desc, title 
-
---Y para q sea solo en una columna 
-
-	WITH cte1 as(
-
-SELECT TOP 1  count(rating.user_id)num_rates, users.name, AVG(rating) avg_rating, title
-FROM users_movies as users
-	JOIN movie_rating as rating
-	ON users.user_id = rating.user_id
-	JOIN movies
-	ON movies.movie_id = rating.movie_id
-WHERE created_at between '2020-01-01' and '2020-12-31'
-group by name, title
-order by num_rates desc, name, avg_rating desc, title )
-
-select name as results
+SELECT STRING_AGG(CONCAT(name,' ', title), CHAR(13)) as results
 from cte1
-UNION
-select title as results
-from cte1
-
 
 --Day 8-5
 
