@@ -894,6 +894,24 @@ from cte1
 --| 2019-01-10   | 1000         | 142.86         |
 --+--------------+--------------+----------------+
 
+WITH cte1 AS (
+SELECT
+  visited_on,
+  SUM(amount) as total
+from customer_3
+group by visited_on
+)
+
+SELECT
+  visited_on,
+  total,
+  AVG(total) OVER (ORDER BY visited_on
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+  ) AS moving_average_payment
+FROM cte1
+
+--Another way to solve it
+
 --sumando amounts
 SELECT DISTINCT  visited_on, SUM(amount) OVER (ORDER BY visited_on
 										ROWS 6 PRECEDING ) as AMOUNT
