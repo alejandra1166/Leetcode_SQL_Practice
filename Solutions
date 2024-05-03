@@ -1006,16 +1006,6 @@ order by friends desc
 --| 45.00    |
 --+----------+
 
---doing the counts for each requirement
-
-select pid, tiv_2015, COUNT( tiv_2015) over (partition by tiv_2015 order by tiv_2015) as tiv_count, 
-		COUNT( lat)over (partition by lat order by lat) as lat_count,
-		COUNT( lon)over (partition by lon order by lon) as lat_count
-from insurance
-
---sum
-
-
 SELECT SUM(tiv_2016) as tiv_2016
 FROM (
 	select pid, 
@@ -1030,6 +1020,24 @@ WHERE lat_count = 1
 	lon_count = 1
 	and 
 	tiv_count > 1
+
+--Another solution
+
+
+with cte1 as (
+
+SELECT rank() over(order by (CONCAT(lat,lon))) as latlon, ins.pid, ins.tiv_2015, ins.tiv_2016, counting_2015
+FROM insurance as ins
+join (SELECT COUNT(tiv_2015) as counting_2015, tiv_2015
+	FROM INSURANCE
+	group by tiv_2015) as cte
+on ins.tiv_2015 = cte.tiv_2015
+)
+
+select SUM(tiv_2016) as total_2016
+from cte1
+
+
 
 
 --Another solution
